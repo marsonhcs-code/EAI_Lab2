@@ -17,6 +17,9 @@ Model pruning is a technique to reduce the size and computational requirements o
 ├── model.py           # SimpleCNN model definition
 ├── train.py           # Training script for MNIST
 ├── prune.py           # Pruning implementation and evaluation
+├── test_pruning.py    # Unit tests for pruning functionality
+├── visualize.py       # Visualization of pruning impact
+├── demo.py            # Complete demonstration workflow
 ├── requirements.txt   # Python dependencies
 └── README.md         # This file
 ```
@@ -36,9 +39,33 @@ pip install -r requirements.txt
 
 ## Usage
 
-### 1. Train the Base Model
+### Quick Start (Recommended)
 
-First, train the original unpruned model on MNIST:
+Run the complete demonstration to see all pruning techniques:
+
+```bash
+python demo.py
+```
+
+This provides a comprehensive walkthrough of all pruning features without requiring dataset downloads.
+
+### 1. Quick Test (No Training Required)
+
+To verify the pruning implementation works:
+
+```bash
+python test_pruning.py
+```
+
+To visualize the impact of pruning:
+
+```bash
+python visualize.py
+```
+
+### 2. Train the Base Model
+
+To train a model on MNIST (requires internet to download dataset):
 
 ```bash
 python train.py
@@ -49,7 +76,7 @@ This will:
 - Train a simple CNN for 5 epochs
 - Save the trained model to `models/mnist_cnn.pth`
 
-### 2. Apply Pruning and Evaluate
+### 3. Apply Pruning and Evaluate
 
 Run the pruning script to compare different pruning strategies:
 
