@@ -106,7 +106,8 @@ def remove_pruning_reparameterization(model):
         if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
             try:
                 prune.remove(module, 'weight')
-            except:
+            except (ValueError, AttributeError):
+                # Module was not pruned, skip
                 pass
     return model
 

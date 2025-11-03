@@ -43,11 +43,6 @@ def visualize_pruning_impact():
         sparsity = 100.0 * (total - nonzero) / total
         compression = total / nonzero
         
-        # Create visual bar
-        bar_length = 40
-        filled = int((nonzero / total) * bar_length)
-        bar = '█' * filled + '░' * (bar_length - filled)
-        
         print(f"{amount*100:>6.0f}%      {nonzero:>12,}       {sparsity:>6.2f}%      {compression:>5.2f}x")
     
     print()

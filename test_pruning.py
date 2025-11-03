@@ -3,6 +3,8 @@ Test script to verify pruning functionality without requiring MNIST download
 """
 import torch
 import torch.nn as nn
+import copy
+import traceback
 from model import SimpleCNN
 from prune import (
     get_model_size, 
@@ -11,7 +13,6 @@ from prune import (
     apply_structured_pruning,
     remove_pruning_reparameterization
 )
-import copy
 
 
 def test_model_creation():
@@ -153,7 +154,6 @@ def main():
         return 1
     except Exception as e:
         print(f"\n✗ Error during testing: {e}")
-        import traceback
         traceback.print_exc()
         return 1
     
