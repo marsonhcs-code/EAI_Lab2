@@ -15,14 +15,15 @@ class Bottleneck(nn.Module):
         ################################################
         # replaced ??? with correct variables          
         ################################################
-        self.conv1 = nn.Conv2d(in_channels, out_channels[0], kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv1 = nn.Conv2d(in_channels, out_channels[0], kernel_size=1, stride=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels[0])
 
         self.conv2 = nn.Conv2d(out_channels[0], out_channels[1], kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channels[1])
 
-        self.conv3 = nn.Conv2d(out_channels[1], out_channels[2], kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv3 = nn.Conv2d(out_channels[1], out_channels[2], kernel_size=1, stride=1, bias=False)
         self.bn3 = nn.BatchNorm2d(out_channels[2])
+
 
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
@@ -68,31 +69,31 @@ class ResNet(nn.Module):
         self.fc = nn.Linear(self.inplanes, num_classes)
 
     def _make_layer(self, block, planes, blocks, cfg, stride=1):
+        ###########################################################
+        # Figure out how to generate the correct layers and downsample based on cfg #
         layers = []
-        # 每個 block 有三個 out_channels，從 cfg 中依序取用
-        out_channels = cfg[self.current_cfg_idx : self.current_cfg_idx + 3]
-        self.current_cfg_idx += 3
+        in_channels = self.inplanes
 
-        # 若 stride != 1 或 inplanes 不等於 expansion * planes，要 downsample
-        downsample = None
-        if stride != 1 or self.inplanes != out_channels[2]:
-            downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, out_channels[2],
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(out_channels[2]),
-            )
-
-        layers.append(block(self.inplanes, planes, out_channels, downsample, stride))
-        self.inplanes = out_channels[2]
-
-        # 其餘 block（stride=1）
-        for _ in range(1, blocks):
-            out_channels = cfg[self.current_cfg_idx : self.current_cfg_idx + 3]
+        for i in range(blocks):
+            out_channels = cfg[self.current_cfg_idx:self.current_cfg_idx + 3]
             self.current_cfg_idx += 3
-            layers.append(block(self.inplanes, planes, out_channels))
-            self.inplanes = out_channels[2]
+
+            if i == 0:
+                # Projection shortcut
+                downsample = nn.Sequential(
+                    nn.Conv2d(in_channels, out_channels[2], kernel_size=1, stride=stride, bias=False),
+                    nn.BatchNorm2d(out_channels[2])
+                )
+                layers.append(block(in_channels, planes, out_channels, downsample, stride))
+            else:
+                # Identity shortcut
+                layers.append(block(in_channels, planes, out_channels, stride=1))
+
+            in_channels = out_channels[2]  # 下一層輸入會是這一層的最後輸出通道
+            self.inplanes = in_channels    # 更新 self.inplanes 給 fc 用
 
         return nn.Sequential(*layers)
+        ###########################################################
 
     def forward(self, x):
         x = self.relu(self.bn1(self.conv1(x)))
